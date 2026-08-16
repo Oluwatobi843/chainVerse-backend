@@ -1,281 +1,285 @@
+# ChainVerse Backend
 
+> Scalable, modular backend infrastructure for ChainVerse Academy, a Web3 education platform.
 
----
+## Overview
 
-# 🚀 ChainVerse Backend (NestJS)
+ChainVerse Backend is a NestJS-based backend that supports a multi-role learning platform with course management, learner progress, certifications, gamification, financial aid, organizations, subscriptions, notifications, reporting and moderation.
 
-> A scalable, modular, and production-grade backend system for ChainVerse Academy, built with **NestJS** and designed using clean architecture principles, domain separation, and enterprise-ready patterns.
+The project represents an architectural migration from Express.js to NestJS. The migration focuses on clear domain boundaries, dependency injection, maintainability, testability and a foundation that can evolve toward distributed services.
 
----
+## Key capabilities
 
-## 📌 Overview
+- Multi-role authentication and account management
+- JWT access and refresh-token authentication
+- Role-based access control
+- Organization-scoped authorization
+- Course creation, discovery and enrollment workflows
+- Reviews, ratings and feedback
+- Gamification, points, achievements and leaderboards
+- Certificate generation and verification
+- Financial-aid applications and review workflows
+- Reporting and analytics
+- Notifications and communication workflows
+- Organization management
+- Subscription plans
+- Sessions and session tracking
+- Abuse reporting and moderation
+- Audit logging
+- Upload quarantine/security controls
 
-This project represents a **full architectural migration** from **Express.js to NestJS**, aimed at transforming a flexible but loosely structured codebase into a **highly maintainable, testable, and scalable system**.
+## Technology stack
 
-The backend is designed to support a modern learning platform with features such as:
+| Layer | Technology |
+|---|---|
+| Framework | NestJS |
+| Language | TypeScript |
+| Database | MongoDB |
+| ODM | Mongoose |
+| Authentication | JWT / Passport-based authentication |
+| Validation | class-validator / class-transformer |
+| Cache | Redis |
+| API documentation | Swagger / OpenAPI |
+| Storage | Local / S3-compatible storage |
+| Testing | Jest / Supertest |
+| Containerization | Docker |
+| CI/CD | GitHub Actions |
 
-* User authentication & role management
-* Course creation and enrollment
-* Certification and achievements
-* Gamification systems
-* Financial aid workflows
-* Analytics and reporting
-* Notifications and communication systems
+## Architecture
 
-### 🎯 Why This Migration Matters
+The backend uses a feature-based modular architecture. Each business domain is isolated into a NestJS module with controllers, services, DTOs and persistence models.
 
-Moving to NestJS enables:
-
-* **Clear modular boundaries** → easier to scale teams and features
-* **Dependency Injection (DI)** → better testability and loose coupling
-* **Consistent architecture** → predictable code organization
-* **Built-in best practices** → guards, interceptors, pipes, etc.
-* **Future microservice readiness**
-
----
-
-## 🏗 Tech Stack
-
-| Layer          | Technology                          | Purpose                       |
-| -------------- | ----------------------------------- | ----------------------------- |
-| Framework      | NestJS                              | Backend architecture          |
-| Language       | TypeScript                          | Type safety & maintainability |
-| Authentication | JWT (Access + Refresh Tokens)       | Secure user sessions          |
-| Validation     | class-validator / class-transformer | DTO validation                |
-| ODM            | Mongoose                            | Database abstraction          |
-| ORM            | Mongoose                            | MongoDB object modeling       |
-| Database       | MongoDB                             | Document data storage         |
-| Caching        | Redis (optional)                    | Performance optimization      |
-| Documentation  | Swagger                             | API exploration               |
-| Storage        | Local / S3-compatible               | File uploads                  |
-
----
-
-## 📁 Project Architecture
-
-The system follows a **feature-based modular architecture**, where each domain is isolated and self-contained.
-
+```text
+                         Client Applications
+                                |
+                                v
+                         NestJS REST API
+                                |
+        +-----------------------+-----------------------+
+        |                       |                       |
+        v                       v                       v
+ Authentication            Domain Modules         Common Services
+        |                       |                       |
+        |              +--------+--------+              |
+        |              |        |        |              |
+        |           Courses  Users   Organizations      |
+        |              |        |        |              |
+        |              +--------+--------+              |
+        |                       |                       |
+        +-----------------------+-----------------------+
+                                |
+                    +-----------+-----------+
+                    |                       |
+                    v                       v
+                 MongoDB                  Redis
 ```
+
+## Domain modules
+
+The codebase is organized around domains including:
+
+```text
 src/
-│
-├── auth/                 # Authentication & JWT logic
-├── users/                # Core user management
-├── tutor-settings/       # Tutor-specific configurations
-├── student-settings/     # Student preferences
-├── admin-settings/       # Admin/moderator controls
-├── courses/              # Course creation & management
-├── reviews/              # Ratings & feedback
-├── leaderboard/          # Ranking system
-├── gamification/         # Points, badges, rewards
-├── certification/        # Certificates & verification
-├── financial-aid/        # Aid application system
-├── reports/              # Analytics & reporting
-├── notification/         # Email / in-app notifications
-├── organization/         # Institutional management
-├── subscription-plan/    # Plans & billing logic
-├── session/              # Session tracking
-└── common/               # Shared utilities & helpers
+├── auth/
+├── users/
+├── tutor-settings/
+├── student-settings/
+├── admin-settings/
+├── courses/
+├── reviews/
+├── leaderboard/
+├── gamification/
+├── certification/
+├── financial-aid/
+├── reports/
+├── notification/
+├── organization/
+├── subscription-plan/
+├── session/
+└── common/
 ```
 
-### 📦 Module Structure
+A typical module follows the separation:
 
-Each module follows a consistent internal structure:
-
-```
+```text
 module/
-├── module.module.ts      # Module definition
-├── module.controller.ts  # Route handlers (thin layer)
-├── module.service.ts     # Business logic
-├── dto/                  # Data Transfer Objects (validation)
-├── entities/             # Database models / schemas
-└── guards/               # Route protection logic
+├── module.module.ts
+├── module.controller.ts
+├── module.service.ts
+├── dto/
+├── entities/
+└── guards/
 ```
 
-### 🧠 Architectural Principles
+### Architectural principles
 
-* **Separation of concerns** (Controller vs Service vs Data)
-* **Single Responsibility Principle**
-* **Domain-driven structure**
-* **Reusable shared utilities in `common/`**
+- Separation of concerns
+- Dependency injection
+- Single Responsibility Principle
+- Domain-oriented modules
+- Thin controllers
+- Business logic in services
+- DTO-based validation
+- Reusable shared utilities
 
----
+## Authentication and authorization
 
-## 🔐 Authentication & Authorization
+### JWT authentication
 
-The system uses **JWT-based authentication** with support for **access and refresh tokens**.
+The API uses access and refresh tokens to support authenticated sessions.
 
-### 🔑 Authentication Flow
+```text
+Login
+  |
+  v
+Credential validation
+  |
+  +----> Access token
+  |
+  +----> Refresh token
+          |
+          v
+     Token refresh
+```
 
-1. User logs in → receives:
+### Platform roles
 
-   * Access Token (short-lived)
-   * Refresh Token (long-lived)
-2. Access token is used for API requests
-3. Refresh token is used to issue new access tokens
+- `ADMIN`
+- `MODERATOR`
+- `TUTOR`
+- `STUDENT`
 
-### 🛡 Role-Based Access Control (RBAC)
+### Organization roles
 
-Supported roles:
+Organizations use a separate permission axis:
 
-* `ADMIN`
-* `MODERATOR`
-* `TUTOR`
-* `STUDENT`
+- `owner`
+- `admin`
+- `instructor`
+- `member`
 
-### 🏢 Organization-Scoped Roles
+Organization membership is scoped to the individual organization, preventing a role in one organization from automatically granting privileges in another.
 
-Global roles describe what a user is on the platform. Membership in an
-organization is a separate axis with its own roles:
+### Guards
 
-* `owner` · `admin` · `instructor` · `member`
+- `JwtAuthGuard` — validates authenticated users
+- `RolesGuard` — enforces platform-level roles
+- `OrganizationRolesGuard` — enforces organization membership permissions
 
-Holding a role in one organization grants nothing in another. See
-[docs/security/organization-authorization.md](docs/security/organization-authorization.md).
+## Security
 
-### 🔒 Guards
+Security is treated as a cross-cutting concern rather than an afterthought.
 
-* `JwtAuthGuard` → validates authenticated users
-* `RolesGuard` → enforces platform role-based permissions
-* `OrganizationRolesGuard` → enforces organization membership roles
+The repository includes documentation and implementation around:
 
-### 📝 Security Documentation
+- Immutable audit logging
+- Organization-scoped authorization
+- Protected uploads
+- Upload quarantine/malware scanning
+- DTO validation
+- Authentication guards
+- Secret management through environment configuration
+- Protected privileged operations
 
-* [Immutable audit logging](docs/security/audit-logging.md) — append-only trail
-  for privileged actions
-* [Organization-scoped authorization](docs/security/organization-authorization.md)
-* [Upload quarantine and malware scanning](docs/security/uploads.md)
+## Core feature areas
 
----
+### Users and identity
 
-## 📦 Core Features Breakdown
+Supports user accounts and role-specific settings for students, tutors, administrators and moderators.
 
-### 👤 Account & Identity
+### Courses
 
-* Multi-role authentication (Admin, Tutor, Student)
-* Profile management per role
-* Secure session handling
+Provides the foundation for course creation, categorization, discovery, enrollment, reviews and analytics.
 
----
+### Gamification
 
-### 📚 Course System
+Includes points, achievements, badges and leaderboard concepts designed to improve learner engagement.
 
-* Course creation & categorization
-* Advanced filtering & search
-* Reviews, ratings, and feedback
-* Course analytics & reporting
+### Certifications
 
----
+Supports certificate generation, verification and controlled certificate-related workflows.
 
-### 🏆 Gamification Engine
+### Financial aid
 
-* Points accumulation system
-* Leaderboards (ranking users)
-* Achievement badges
-* NFT-based rewards (extensible)
+Provides an application lifecycle for learners and administrative review.
 
----
+### Organizations
 
-### 🎓 Certification System
+Supports institutional structures and organization-specific permissions.
 
-* Certificate generation
-* Download & verification
-* Social sharing capabilities
-* Controlled name-change request flow
+### Reporting
 
----
+Provides reporting and analytics capabilities for learner, tutor and course activity.
 
-### 💰 Financial Aid
+### Notifications
 
-* Student application workflow
-* Admin review system
-* Approval/rejection lifecycle
+Provides a foundation for email and in-app communication.
 
----
+### Moderation
 
-### 📊 Reporting & Analytics
+Includes abuse-reporting and moderation workflows for platform safety.
 
-* Tutor performance insights
-* Student progress tracking
-* Course-level analytics
+## API documentation
 
----
+Swagger/OpenAPI is used to document the REST API and expose an interactive API interface.
 
-### 🛎 Platform Systems
+When the application is running, use the Swagger route configured by the application (currently documented as `/docs`).
 
-* Notifications (email/in-app ready)
-* FAQ & legal pages
-* Contact & messaging system
-* Organization management
-* Subscription plans
-* Abuse reporting & moderation
+## Getting started
 
----
+### Prerequisites
 
-## 🛠 Installation & Setup
+- Node.js
+- npm
+- MongoDB
+- Redis when cache-dependent features are enabled
+
+### Clone the repository
 
 ```bash
-# Clone repository
-git clone https://github.com/your-username/chainverse-backend.git
+git clone https://github.com/Oluwatobi843/chainVerse-backend.git
+cd chainVerse-backend
+```
 
-# Enter project directory
-cd chainverse-backend
+### Install dependencies
 
-# Install dependencies
+```bash
 npm install
 ```
 
----
+### Configure environment variables
 
-## ⚙️ Environment Configuration
+Create a `.env` file using the variables expected by the application configuration. A typical configuration includes:
 
-Create a `.env` file in the root directory:
-
-```
+```env
 PORT=3000
-
 MONGODB_URI=mongodb://localhost:27017/chainverse
 MONGO_URI=mongodb://localhost:27017/chainverse
-
-JWT_SECRET=your_access_secret
-JWT_REFRESH_SECRET=your_refresh_secret
+JWT_SECRET=replace-with-a-strong-secret
+JWT_REFRESH_SECRET=replace-with-a-strong-refresh-secret
 ```
 
-> 💡 Tip: Use strong secrets and never commit `.env` to version control.
+Do not commit real credentials, private keys or production secrets.
 
----
-
-## ▶️ Running the Application
+### Run in development
 
 ```bash
-# Development (watch mode)
 npm run start:dev
+```
 
-# Build for production
+### Build
+
+```bash
 npm run build
+```
 
-# Run production server
+### Run production build
+
+```bash
 npm run start:prod
 ```
 
----
-
-## 📄 API Documentation (Swagger)
-
-After starting the server:
-
-```
-http://localhost:3000/docs
-```
-
-This provides:
-
-* Interactive API testing
-* Request/response schemas
-* Authentication support
-
----
-
-## 🧪 Testing Strategy
+## Testing
 
 ```bash
 # Unit tests
@@ -285,73 +289,57 @@ npm run test
 npm run test:e2e
 ```
 
-### ✅ Testing Philosophy
+The intended testing strategy is to unit-test business services, cover critical HTTP flows with end-to-end tests, and mock external dependencies where appropriate.
 
-* Services should be **unit tested**
-* Critical flows should have **e2e coverage**
-* Mock external dependencies where needed
+## Development guidelines
 
----
+When extending the backend:
 
-## 🧩 Migration Philosophy
+1. Keep controllers focused on HTTP concerns.
+2. Put business rules in services.
+3. Define request contracts with DTOs.
+4. Validate external input.
+5. Protect restricted routes with the appropriate guards.
+6. Document public endpoints with Swagger decorators.
+7. Keep domain-specific logic inside its module.
+8. Add tests for new business-critical behavior.
 
-This migration was not just a rewrite—it was a **system redesign** focused on:
+## Migration from Express to NestJS
 
-* Long-term maintainability
-* Predictable development patterns
-* Improved onboarding for new developers
-* Scalability toward microservices
+The migration is an architectural redesign rather than a framework-only rewrite.
 
----
+The move to NestJS provides:
 
-## 📌 Development Guidelines
+- Stronger modular boundaries
+- Dependency injection
+- Consistent application structure
+- Reusable guards, pipes and interceptors
+- Improved testability
+- Easier onboarding for contributors
+- A clearer path toward future distributed services
 
-To maintain consistency across the codebase:
+## Roadmap
 
-* ✅ Keep controllers thin (no business logic)
-* ✅ Place logic inside services
-* ✅ Use DTOs for all inputs
-* ✅ Validate all external data
-* ✅ Protect routes with guards
-* ✅ Document endpoints with Swagger decorators
-* ✅ Follow SOLID principles
+Potential future work includes:
 
----
+- Microservice decomposition using gRPC, Redis or RabbitMQ
+- WebSocket-based real-time features
+- Expanded blockchain/NFT integrations
+- Payment gateway integrations
+- Containerized deployment
+- More comprehensive CI/CD automation
+- Production observability and monitoring
 
-## 🚀 Future Roadmap
+## Portfolio value
 
-Planned enhancements include:
+This project demonstrates practical backend engineering across architecture, authentication, authorization, persistence, caching, API documentation, security and DevOps. It is particularly relevant to Backend Software Engineer roles requiring **NestJS, TypeScript, MongoDB, REST APIs and production-oriented system design**.
 
-* Microservices architecture (gRPC / Redis / RMQ)
-* Real-time features (WebSockets)
-* Blockchain/NFT integrations
-* Payment gateway integration
-* CI/CD pipelines
-* Docker & container orchestration
+## Author
 
----
+**Oluwatobi843**
 
-## 🤝 Contributing
+GitHub: https://github.com/Oluwatobi843
 
-We welcome contributions! Follow these steps:
+## License
 
-1. Fork the repository
-2. Create a feature branch (`feat/your-feature`)
-3. Follow coding and architectural standards
-4. Add validation and documentation
-5. Submit a Pull Request
-
-### 📌 Contribution Requirements
-
-* Must follow NestJS best practices
-* Must include DTO validation
-* Must include Swagger docs
-* Must pass all tests
-
----
-
-## 📜 License
-
-MIT License
-
----
+MIT License.
